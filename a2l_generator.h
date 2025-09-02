@@ -3,11 +3,12 @@
 
 typedef struct {
     const char* name;
-    const char* datatype;
+    const char* datatype;  // UBYTE, UWORD, SWORD, etc.
     double minVal;
     double maxVal;
 } Variable;
 
-void generate_a2l(const char* filename, const char* ecuName, const Variable* vars, int varCount);
+void generate_a2l(const char* filename, const char* ecuName,
+                  const Variable* vars, int varCount);
 
 #endif
