@@ -3,7 +3,8 @@ project(sample_ecu_demo C)
 
 set(CMAKE_C_STANDARD 11)
 
+# All source files
 add_executable(sample_ecu_demo
-    src/main.c
-    src/a2l_generator.c
+    main.c
+    a2l_generator.c
 )
