@@ -1,18 +1,30 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Clean and prepare build directory
-rm -rf build
-mkdir build
+PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
+TP_DIR="$PROJECT_DIR/third_party"
+XCPL_DIR="$TP_DIR/XCPlite"
 
-# Run CMake & Build
-cd build
-cmake ..
-make -j$(nproc)
+echo "==> Preparing third_party..."
+mkdir -p "$TP_DIR"
 
-# Copy final binary and A2L to project root
-cp sample_ecu_demo ../sample_ecu_demo.out
-cd ..
+if [ ! -d "$XCPL_DIR/.git" ]; then
+  echo "==> Fetching XCPlite (MIT) ..."
+  git clone --depth=1 https://github.com/vectorgrp/XCPlite.git "$XCPL_DIR"
+else
+  echo "==> Updating XCPlite ..."
+  (cd "$XCPL_DIR" && git pull --ff-only)
+fi
 
-echo "✅ Build complete!"
-echo "Run ./sample_ecu_demo.out to start the ECU server."
+echo "==> Configuring & building..."
+rm -rf "$PROJECT_DIR/build"
+cmake -S "$PROJECT_DIR" -B "$PROJECT_DIR/build"
+cmake --build "$PROJECT_DIR/build" -j"$(nproc)"
+
+# convenience: copy artifacts to root
+cp "$PROJECT_DIR/build/sample_ecu_demo" "$PROJECT_DIR/sample_ecu_demo.out" || true
+cp "$PROJECT_DIR/build/sample_ecu_demo.a2l" "$PROJECT_DIR/sample_ecu_demo.a2l" || true
+
+echo
+echo "✅ Build done."
+echo "Run:  ./sample_ecu_demo.out"
